@@ -35,6 +35,8 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin12345
       TZ: Europe/Prague
+    env_file:
+      - stack.env
     command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_general_ci' ]
     volumes:
       - skj_project-db-data:/var/lib/mysql
