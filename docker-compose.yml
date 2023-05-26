@@ -1,0 +1,66 @@
+version: "3.11"
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=project
+      - DB_USER=admin
+      - DB_PASSWORD=admin12345
+    networks:
+      - skj_project-network
+
+  tailwind:
+    build: .
+    command: python manage.py tailwind start
+    volumes:
+      - .:/code
+    networks:
+      - skj_project-network
+    tty: true
+
+  db:
+    image: mariadb:10.11
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: project
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin12345
+      TZ: Europe/Prague
+    command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_general_ci' ]
+    volumes:
+      - skj_project-db-data:/var/lib/mysql
+    networks:
+      - skj_project-network
+
+  adminer:
+    image: adminer
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "10"
+
+    ports:
+      - "127.0.0.1:8888:8080"
+    networks:
+      - skj_project-network
+    depends_on:
+      - db
+
+volumes:
+  skj_project-db-data:
+
+networks:
+  skj_project-network:
+    driver: bridge
+
